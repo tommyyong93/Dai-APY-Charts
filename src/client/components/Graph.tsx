@@ -61,7 +61,7 @@ export class Graph extends React.Component {
           blockNumbers : [...this.state.blockNumbers, lastBlock],
           compoundHistorical : [...this.state.compoundHistorical, compApy],
           aaveHistorical : [...this.state.aaveHistorical, aaveApy],
-          graphData: [...this.state.graphData, {name:lastBlock.toString(),"Compound APY":compApy, "AAVE APY" : aaveApy}],
+          graphData: [...this.state.graphData, {name:lastBlock.toString(),"Compound APY":compApy, "Aave APY" : aaveApy}],
           currentBlock: lastBlock
       })
     }
@@ -95,7 +95,7 @@ export class Graph extends React.Component {
             blockNumbers : [...this.state.blockNumbers, lastBlock],
             compoundHistorical : [...this.state.compoundHistorical, compApy],
             aaveHistorical : [...this.state.aaveHistorical, aaveApy],
-            graphData: [...this.state.graphData, {name:lastBlock.toString(),"Compound APY":compApy, "AAVE APY" : aaveApy}],
+            graphData: [...this.state.graphData, {name:lastBlock.toString(),"Compound APY":compApy, "Aave APY" : aaveApy}],
             currentBlock: lastBlock
         })
       }
@@ -105,7 +105,7 @@ export class Graph extends React.Component {
   render(){
 
     return (
-        <ResponsiveContainer width="80%" height="80%" className='graph-container'>
+        <ResponsiveContainer width="85%" height="80%" className='graph-container'>
           <LineChart
             width={500}
             height={300}
@@ -122,8 +122,8 @@ export class Graph extends React.Component {
             <YAxis dataKey="Compound APY" label={{ value: "APY", position:"left"}} domain={[0, 'auto']} />
             <Tooltip />
             <Legend align="right"/>
-            <Line type="linear" dataKey="Compound APY" stroke="#82ca9d" dot={true}/>
-            <Line type="linear" dataKey="AAVE APY" stroke="#8884d8" dot={true}/>
+            <Line type="linear" dataKey="Compound APY" stroke="#82ca9d" dot={true} strokeWidth={2}/>
+            <Line type="linear" dataKey="Aave APY" stroke="#8884d8" dot={true} strokeWidth={2}/>
           </LineChart>
         </ResponsiveContainer>
     )

@@ -1,3 +1,9 @@
+.headerContainer{
+  border: 2px solid grey;
+  border-radius: 15px;
+  background-color: #b7b7a4;
+}
+
 .header {
   display: block;
   align-items: center;
@@ -7,6 +13,7 @@
   flex-direction: row;
   width: 100%;
   top: 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   padding: 1rem;
+  font-size: 2em;
+  color: #6b705c;
 }
