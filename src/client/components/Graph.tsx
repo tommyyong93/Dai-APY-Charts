@@ -105,27 +105,27 @@ export class Graph extends React.Component {
   render(){
 
     return (
-      <ResponsiveContainer width="80%" height="80%" className='graph-container'>
-        <LineChart
-          width={500}
-          height={300}
-          data={this.state.graphData}
-          margin={{
-            top: 5,
-            right: 50,
-            left: 50,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" label={{ value: "Block #",position:"bottom"}}/>
-          <YAxis dataKey="Compound APY" label={{ value: "APY", position:"left"}} domain={[0, 'auto']} />
-          <Tooltip />
-          <Legend align="right"/>
-          <Line type="linear" dataKey="Compound APY" stroke="#82ca9d" dot={false}/>
-          <Line type="linear" dataKey="AAVE APY" stroke="#8884d8" dot={false}/>
-        </LineChart>
-      </ResponsiveContainer>
+        <ResponsiveContainer width="80%" height="80%" className='graph-container'>
+          <LineChart
+            width={500}
+            height={300}
+            data={this.state.graphData}
+            margin={{
+              top: 5,
+              right: 50,
+              left: 50,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" label={{ value: "Block #",position:"bottom"}}/>
+            <YAxis dataKey="Compound APY" label={{ value: "APY", position:"left"}} domain={[0, 'auto']} />
+            <Tooltip />
+            <Legend align="right"/>
+            <Line type="linear" dataKey="Compound APY" stroke="#82ca9d" dot={true}/>
+            <Line type="linear" dataKey="AAVE APY" stroke="#8884d8" dot={true}/>
+          </LineChart>
+        </ResponsiveContainer>
     )
   }
 }
