@@ -14,9 +14,10 @@ export class Graph extends React.Component {
 
     this.state = {
       blockNumbers: [],
+      timeStamp: [],
       compoundHistorical: [],
       aaveHistorical: [],
-      currentBlock: null,
+      currentBlock: 0,
       graphData: []
     };
 
@@ -38,10 +39,40 @@ export class Graph extends React.Component {
   }
 
   async getHistorical(){
-    const currentBlock = await this.provider.getBlockNumber();
+    // fetch all data from the database
+    fetch('http://localhost:3001/rates',{
+      method: "GET"
+    }).then(res => res.json()).then(data => {
+      for(let i = 0; i < data.length ; i++){
+        // need to format datetime object from the database
+        let date = new Date(data[i].timestamp * 1000);
+        const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
+        const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
+        const formattedDate = year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + seconds;
+        this.setState({
+          blockNumbers : [...this.state.blockNumbers, data[i].block_number],
+          timeStamp : [...this.state.timeStamp, data[i].timestamp],
+          compoundHistorical : [...this.state.compoundHistorical, data[i].compound_rate],
+          aaveHistorical : [...this.state.aaveHistorical, data[i].aave_rate],
+          graphData: [...this.state.graphData, {name:formattedDate,"Compound APY":data[i].compound_rate, "Aave APY" : data[i].aave_rate}],
+          currentBlock: data[i].block_number
+        })
+      }
+    })
 
-    // get all the historical data from the last 128 blocks
-    for(let lastBlock = currentBlock - 127 ; lastBlock < currentBlock ; lastBlock++){
+    let lastBlockInDataBase = this.state.currentBlock;
+    let currentBlock = await this.provider.getBlockNumber();
+
+    // we can only poll 128 blocks back from within the current block
+    if(currentBlock - lastBlockInDataBase >= 128){
+      lastBlockInDataBase = currentBlock - 127;
+    }
+    else{
+      lastBlockInDataBase = currentBlock - lastBlockInDataBase;
+    }
+
+    // get all the historical data
+    for(let lastBlock = lastBlockInDataBase ; lastBlock <= currentBlock ; lastBlock++){
       // calculate APY for Compound
       let nextRate = await this.compoundDaiContract.supplyRatePerBlock({blockTag: lastBlock}).then(result => {
         return result;
@@ -56,14 +87,35 @@ export class Graph extends React.Component {
       let currentLiquidityRate = lendingPoolQuery.currentLiquidityRate;
       let aaveApy = calculateAPYDai(currentLiquidityRate);
 
+      // get time stamp
+      let block = await this.provider.getBlock(lastBlock);
+      let timestamp = block.timestamp;
+      // block timestamp is in seconds Date accepts arguments in milliseconds
+      let date = new Date(timestamp * 1000);
+      const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
+      const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
+      const formattedDate = year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + seconds;
+
       // set state in each update so graph updates
       this.setState({
           blockNumbers : [...this.state.blockNumbers, lastBlock],
+          timeStamp : [...this.state.timeStamp, timestamp],
           compoundHistorical : [...this.state.compoundHistorical, compApy],
           aaveHistorical : [...this.state.aaveHistorical, aaveApy],
-          graphData: [...this.state.graphData, {name:lastBlock.toString(),"Compound APY":compApy, "Aave APY" : aaveApy}],
+          graphData: [...this.state.graphData, {name:formattedDate,"Compound APY":compApy, "Aave APY" : aaveApy}],
           currentBlock: lastBlock
       })
+
+      // populate database
+      fetch('http://localhost:3001/rates',{
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"blockNumber" : lastBlock, "timeStamp" : timestamp, "compApy" : compApy, "aaveApy": aaveApy})
+      }).catch(err => console.log(err))
+
     }
 
     // poll for new data as new blocks are mined
@@ -91,13 +143,34 @@ export class Graph extends React.Component {
         let currentLiquidityRate = lendingPoolQuery.currentLiquidityRate;
         let aaveApy = calculateAPYDai(currentLiquidityRate);
 
+        // get time stamp
+        let block = await this.provider.getBlock(lastBlock);
+        let timestamp = block.timestamp;
+        // block timestamp is in seconds Date accepts arguments in milliseconds
+        let date = new Date(timestamp * 1000);
+        const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
+        const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
+        const formattedDate = year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + seconds;
+
+        // set component state
         this.setState({
             blockNumbers : [...this.state.blockNumbers, lastBlock],
+            timeStamp : [...this.state.timeStamp, timestamp],
             compoundHistorical : [...this.state.compoundHistorical, compApy],
             aaveHistorical : [...this.state.aaveHistorical, aaveApy],
-            graphData: [...this.state.graphData, {name:lastBlock.toString(),"Compound APY":compApy, "Aave APY" : aaveApy}],
+            graphData: [...this.state.graphData, {name:formattedDate,"Compound APY":compApy, "Aave APY" : aaveApy}],
             currentBlock: lastBlock
         })
+
+        // populate database
+        fetch('http://localhost:3001/rates',{
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({"blockNumber" : lastBlock, "timeStamp" : timestamp, "compApy" : compApy, "aaveApy": aaveApy})
+        }).catch(err => console.log(err))
       }
     }
   }
@@ -118,7 +191,7 @@ export class Graph extends React.Component {
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" label={{ value: "Block #",position:"bottom"}}/>
+            <XAxis dataKey="name" label={{ value: "Date",position:"bottom"}}/>
             <YAxis dataKey="Compound APY" label={{ value: "APY", position:"left"}} domain={[0, 'auto']} />
             <Tooltip />
             <Legend align="right"/>

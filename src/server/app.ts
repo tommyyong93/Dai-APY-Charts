@@ -1,11 +1,21 @@
 import express, { Request, Response } from 'express';
-
+const queries = require("./queries.js");
 const app = express();
+const bodyParser = require('body-parser')
 
 app.use('/bundles', express.static(`public/bundles`, { maxAge: 604800e3 }));
 app.use(express.static(`public`, { maxAge: 604800e3 }));
+app.use(bodyParser.json())
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+)
 
-app.get('*', async (req: Request, res: Response) => {
+app.get('/rates', queries.getRates)
+app.post('/rates', queries.createRate)
+
+app.get('/', async (req: Request, res: Response) => {
   try {
     // Disable caching of index file
     res.setHeader('Surrogate-Control', 'no-store');
