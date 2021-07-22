@@ -11,4 +11,10 @@ export const client = new Client({
 // This is an okay place to do migrations
 (async () => {
   await client.connect();
+  await client.query(`CREATE TABLE IF NOT EXISTS "dai_rates"(
+    "block_number" INT PRIMARY KEY,
+    "timestamp" INT,
+    "compound_rate" FLOAT(53),
+    "aave_rate" FLOAT(53)
+  );`);
 })();
