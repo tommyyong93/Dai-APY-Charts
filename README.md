@@ -18,4 +18,4 @@ rate for the 2 protocols, can be found in the contracts folder from the root dir
 
 <hr>
 
-On-chain queries are stored on a PostgreSQL database further utilizing Redis as a read-through cache.
+On-chain queries are stored on a PostgreSQL database also utilizing Redis as a read-through cache.
