@@ -13,10 +13,6 @@ export class Graph extends React.Component {
     super(props)
 
     this.state = {
-      blockNumbers: [],
-      timeStamp: [],
-      compoundHistorical: [],
-      aaveHistorical: [],
       currentBlock: 0,
       graphData: []
     };
@@ -50,10 +46,6 @@ export class Graph extends React.Component {
         const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
         const formattedDate = year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + seconds;
         this.setState({
-          blockNumbers : [...this.state.blockNumbers, data[i].block_number],
-          timeStamp : [...this.state.timeStamp, data[i].timestamp],
-          compoundHistorical : [...this.state.compoundHistorical, data[i].compound_rate],
-          aaveHistorical : [...this.state.aaveHistorical, data[i].aave_rate],
           graphData: [...this.state.graphData, {name:formattedDate,"Compound APY":data[i].compound_rate, "Aave APY" : data[i].aave_rate}],
           currentBlock: data[i].block_number
         })
@@ -98,10 +90,6 @@ export class Graph extends React.Component {
 
       // set state in each update so graph updates
       this.setState({
-          blockNumbers : [...this.state.blockNumbers, lastBlock],
-          timeStamp : [...this.state.timeStamp, timestamp],
-          compoundHistorical : [...this.state.compoundHistorical, compApy],
-          aaveHistorical : [...this.state.aaveHistorical, aaveApy],
           graphData: [...this.state.graphData, {name:formattedDate,"Compound APY":compApy, "Aave APY" : aaveApy}],
           currentBlock: lastBlock
       })
@@ -154,10 +142,6 @@ export class Graph extends React.Component {
 
         // set component state
         this.setState({
-            blockNumbers : [...this.state.blockNumbers, lastBlock],
-            timeStamp : [...this.state.timeStamp, timestamp],
-            compoundHistorical : [...this.state.compoundHistorical, compApy],
-            aaveHistorical : [...this.state.aaveHistorical, aaveApy],
             graphData: [...this.state.graphData, {name:formattedDate,"Compound APY":compApy, "Aave APY" : aaveApy}],
             currentBlock: lastBlock
         })
